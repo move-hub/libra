@@ -7,7 +7,7 @@ use libra_types::{
     contract_event::ContractEvent,
 };
 use move_core_types::{gas_schedule::CostTable, identifier::IdentStr, language_storage::ModuleId};
-use move_vm_natives::{account, event, hash, lcs, signature};
+use move_vm_natives::{account, event, hash, lcs, signature, resource_info};
 use move_vm_types::{
     interpreter_context::InterpreterContext,
     loaded_data::{runtime_types::Type, types::FatType},
@@ -42,6 +42,7 @@ pub(crate) enum NativeFunction {
     AccountSaveAccount,
     DebugPrint,
     DebugPrintStackTrace,
+    ResourceModuleAddress,
 }
 
 impl NativeFunction {
@@ -73,6 +74,7 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "LibraAccount", "save_account") => AccountSaveAccount,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
+            (&CORE_CODE_ADDRESS, "ResourceInfo", "module_address") => ResourceModuleAddress,
             _ => return None,
         })
     }
@@ -105,6 +107,7 @@ impl NativeFunction {
             Self::LCSToBytes => lcs::native_to_bytes(ctx, t, v),
             Self::DebugPrint => debug::native_print(ctx, t, v),
             Self::DebugPrintStackTrace => debug::native_print_stack_trace(ctx, t, v),
+            Self::ResourceModuleAddress => resource_info::module_address(ctx, t, v),
         }
     }
 }
