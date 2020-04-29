@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use super::{hash, lcs, signature};
+use super::{hash, lcs, module_info, signature};
 use crate::{
     loaded_data::runtime_types::{Type, TypeConverter},
     values::{debug, vector, Value},
@@ -87,6 +87,7 @@ pub enum NativeFunction {
     AccountSaveAccount,
     DebugPrint,
     DebugPrintStackTrace,
+    ResourceModuleAddress,
 }
 
 impl NativeFunction {
@@ -114,6 +115,7 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "LibraAccount", "save_account") => AccountSaveAccount,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
+            (&CORE_CODE_ADDRESS, "ModuleInfo", "module_address") => ResourceModuleAddress,
             _ => return None,
         })
     }
@@ -165,6 +167,13 @@ impl NativeFunction {
             Self::DebugPrintStackTrace => Err(VMStatus::new(StatusCode::UNREACHABLE).with_message(
                 "print_stack_trace does not have a native implementation".to_string(),
             )),
+            Self::ResourceModuleAddress => {
+                let mut fat_ty_args = vec![];
+                for ty in &t {
+                    fat_ty_args.push(type_converter.type_to_fat_type(ty)?);
+                }
+                module_info::module_address(fat_ty_args, v, c)
+            }
         }
     }
 
@@ -189,6 +198,7 @@ impl NativeFunction {
             Self::AccountSaveAccount => 5,
             Self::DebugPrint => 1,
             Self::DebugPrintStackTrace => 0,
+            Self::ResourceModuleAddress => 0,
         }
     }
 
@@ -265,6 +275,16 @@ impl NativeFunction {
                 let type_parameters = vec![Kind::All];
                 let parameters = vec![Reference(Box::new(TypeParameter(0)))];
                 let return_ = vec![Vector(Box::new(U8))];
+                FunctionSignature {
+                    type_parameters,
+                    parameters,
+                    return_,
+                }
+            }
+            Self::ResourceModuleAddress => {
+                let type_parameters = vec![Kind::Resource];
+                let parameters = vec![];
+                let return_ = vec![SignatureToken::Address];
                 FunctionSignature {
                     type_parameters,
                     parameters,

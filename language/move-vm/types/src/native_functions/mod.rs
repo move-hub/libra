@@ -5,4 +5,5 @@
 pub mod dispatch;
 pub mod hash;
 pub mod lcs;
+pub mod module_info;
 pub mod signature;

@@ -245,6 +245,7 @@ pub fn words_in(size: AbstractMemorySize<GasCarrier>) -> AbstractMemorySize<GasC
     })
 }
 
+// FIXME: missing vector related functions
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[repr(u8)]
@@ -263,4 +264,5 @@ pub enum NativeCostIndex {
     DESTROY_EMPTY = 11,
     SWAP = 12,
     SAVE_ACCOUNT = 13,
+    MODULE_ADDRESS = 14,
 }
