@@ -52,7 +52,7 @@ pub struct AstWriter {
 }
 
 impl AstWriter {
-    fn new(verbose: bool) -> Self {
+    pub fn new(verbose: bool) -> Self {
         Self {
             verbose,
             margin: 0,
@@ -60,11 +60,11 @@ impl AstWriter {
         }
     }
 
-    fn normal() -> Self {
+    pub fn normal() -> Self {
         Self::new(false)
     }
 
-    fn verbose() -> Self {
+    pub fn verbose() -> Self {
         Self::new(true)
     }
 
